@@ -1,6 +1,9 @@
 services:
   ordena24_api:
     restart: 'no'
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     image: apps/ordena24_api_dev:1
     ports:
       - '8000:8000'
@@ -13,13 +16,14 @@ services:
       - DB_PASSWORD=ordena24_pass
     networks:
       - ordena24_net
-    volumes:
-      - 'ordena24_api_app:/var/www/html'
     depends_on:
       - ordena24_api_db
   
   ordena24_webapp:
     restart: 'no'
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
     image: apps/ordena24_webapp_dev:1
     ports:
       - '80:8000'
@@ -33,8 +37,6 @@ services:
       - API_URL=http://ordena24_api:8000
     networks:
       - ordena24_net
-    volumes:
-      - 'ordena24_webapp_app:/var/www/html'
     depends_on:
       - ordena24_webapp_db
       - ordena24_api
@@ -74,12 +76,6 @@ networks:
     driver: bridge
 
 volumes:
-  ordena24_api_app:
-    driver: local
-
-  ordena24_webapp_app:
-    driver: local
-
   ordena24_api_db_data:
     driver: local
 
