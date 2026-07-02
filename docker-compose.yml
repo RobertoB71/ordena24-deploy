@@ -1,35 +1,85 @@
 services:
-  ordena24_api_db:
-    image: bitnamilegacy/postgresql:14.9.0
-    container_name: ordena24_api_db
-    restart: "no"
+  ordena24_api:
+    restart: 'no'
+    image: apps/ordena24_api_dev:1
     ports:
-      - "5433:5432"
+      - '8000:8000'
+    environment:
+      - TZ=UTC
+      - DB_HOST=ordena24_api_db
+      - DB_PORT=5432
+      - DB_NAME=ordena24_api_db
+      - DB_USER=ordena24_user
+      - DB_PASSWORD=ordena24_pass
+    networks:
+      - ordena24_net
+    volumes:
+      - 'ordena24_api_app:/var/www/html'
+    depends_on:
+      - ordena24_api_db
+  
+  ordena24_webapp:
+    restart: 'no'
+    image: apps/ordena24_webapp_dev:1
+    ports:
+      - '80:8000'
+    environment:
+      - TZ=UTC
+      - WEBAPP_DB_HOST=ordena24_webapp_db
+      - WEBAPP_DB_PORT=5432
+      - WEBAPP_DB_NAME=ordena24_webapp_db
+      - WEBAPP_DB_USER=ordena24_webapp_user
+      - WEBAPP_DB_PASSWORD=ordena24_webapp_pass
+      - API_URL=http://ordena24_api:8000
+    networks:
+      - ordena24_net
+    volumes:
+      - 'ordena24_webapp_app:/var/www/html'
+    depends_on:
+      - ordena24_webapp_db
+      - ordena24_api
+
+  ordena24_api_db:
+    image: 'bitnamilegacy/postgresql:14.9.0'
+    ports:
+      - '5433:5432'
     environment:
       - TZ=UTC
       - POSTGRESQL_DATABASE=ordena24_api_db
       - POSTGRESQL_USERNAME=ordena24_user
       - POSTGRESQL_PASSWORD=ordena24_pass
+    networks:
+      - ordena24_net
     volumes:
-      - ordena24_api_db_data:/bitnami/postgresql
-      - ./sql/DB_API_ORDENA24.sql:/docker-entrypoint-initdb.d/01_api.sql
+      - 'ordena24_api_db_data:/bitnami/postgresql'
+      - './sql/DB_API_ORDENA24.sql:/docker-entrypoint-initdb.d/01_api.sql'
 
   ordena24_webapp_db:
-    image: bitnamilegacy/postgresql:14.9.0
-    container_name: ordena24_webapp_db
-    restart: "no"
+    image: 'bitnamilegacy/postgresql:14.9.0'
     ports:
-      - "5434:5432"
+      - '5434:5432'
     environment:
       - TZ=UTC
       - POSTGRESQL_DATABASE=ordena24_webapp_db
       - POSTGRESQL_USERNAME=ordena24_webapp_user
       - POSTGRESQL_PASSWORD=ordena24_webapp_pass
+    networks:
+      - ordena24_net
     volumes:
-      - ordena24_webapp_db_data:/bitnami/postgresql
-      - ./sql/DB_WEBAPP_ORDENA24.sql:/docker-entrypoint-initdb.d/01_webapp.sql
+      - 'ordena24_webapp_db_data:/bitnami/postgresql'
+      - './sql/DB_WEBAPP_ORDENA24.sql:/docker-entrypoint-initdb.d/01_webapp.sql'
+
+networks:
+  ordena24_net:
+    driver: bridge
 
 volumes:
+  ordena24_api_app:
+    driver: local
+
+  ordena24_webapp_app:
+    driver: local
+
   ordena24_api_db_data:
     driver: local
 
