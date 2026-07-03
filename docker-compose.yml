@@ -14,11 +14,18 @@ services:
       - DB_NAME=ordena24_api_db
       - DB_USER=ordena24_user
       - DB_PASSWORD=ordena24_pass
+
+      - WEBAPP_DB_HOST=ordena24_webapp_db
+      - WEBAPP_DB_PORT=5432
+      - WEBAPP_DB_NAME=ordena24_webapp_db
+      - WEBAPP_DB_USER=ordena24_webapp_user
+      - WEBAPP_DB_PASSWORD=ordena24_webapp_pass
     networks:
       - ordena24_net
     depends_on:
       - ordena24_api_db
-  
+      - ordena24_webapp_db
+      
   ordena24_webapp:
     restart: 'no'
     build:

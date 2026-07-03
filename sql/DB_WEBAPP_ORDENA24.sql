@@ -1,8 +1,6 @@
-SET search_path TO public;
-
 CREATE TABLE IF NOT EXISTS roles (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nombre VARCHAR(50) NOT NULL UNIQUE
+    descripcion VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -15,12 +13,18 @@ CREATE TABLE IF NOT EXISTS usuarios (
     registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO roles (nombre) VALUES
-('cliente'),
-('personal'),
-('admin');
+INSERT INTO usuarios (nombre, email, password, rol_id, activo)
+VALUES (
+    'Administrador Ordena24',
+    'admin@ordena24.com',
+    '$2b$12$7QJ8Mki60nKkLxU1v7O6E.umt4P2PvNLhkcDFNJkPHO/TKFG34MeC',
+    3,
+    TRUE
+)
+ON CONFLICT (email) DO NOTHING;
 
-INSERT INTO usuarios (nombre, email, password, rol_id) VALUES
-('Administrador Ordena24', 'admin@ordena24.com', 'admin123', 3),
-('Personal Restaurante', 'personal@ordena24.com', 'personal123', 2),
-('Cliente Demo', 'cliente@ordena24.com', 'cliente123', 1);
+INSERT INTO roles (descripcion) VALUES
+('cliente'),
+('trabajador'),
+('admin')
+ON CONFLICT (descripcion) DO NOTHING;
