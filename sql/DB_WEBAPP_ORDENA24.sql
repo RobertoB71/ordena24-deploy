@@ -13,6 +13,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
     registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO roles (descripcion) VALUES
+('cliente'),
+('trabajador'),
+('admin')
+ON CONFLICT (descripcion) DO NOTHING;
+
 INSERT INTO usuarios (nombre, email, password, rol_id, activo)
 VALUES (
     'Administrador Ordena24',
@@ -22,9 +28,3 @@ VALUES (
     TRUE
 )
 ON CONFLICT (email) DO NOTHING;
-
-INSERT INTO roles (descripcion) VALUES
-('cliente'),
-('trabajador'),
-('admin')
-ON CONFLICT (descripcion) DO NOTHING;
