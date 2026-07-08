@@ -25,7 +25,9 @@ services:
     depends_on:
       - ordena24_api_db
       - ordena24_webapp_db
-      
+    volumes:
+      - './uploads:/app/uploads'
+
   ordena24_webapp:
     restart: 'no'
     build:
