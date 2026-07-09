@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS categorias (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     descripcion VARCHAR(100) NOT NULL UNIQUE,
@@ -7,12 +6,16 @@ CREATE TABLE IF NOT EXISTS categorias (
 
 CREATE TABLE IF NOT EXISTS productos (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nombre VARCHAR(150) NOT NULL,
+    nombre VARCHAR(150) NOT NULL UNIQUE,
     descripcion TEXT,
     precio NUMERIC(10, 2) NOT NULL,
     categoria_id INTEGER NOT NULL,
     disponible BOOLEAN NOT NULL DEFAULT TRUE,
-    imagen_url VARCHAR(255)
+    imagen_url VARCHAR(255),
+
+    CONSTRAINT fk_producto_categoria
+        FOREIGN KEY (categoria_id)
+        REFERENCES categorias(id)
 );
 
 CREATE TABLE IF NOT EXISTS pedidos (
@@ -47,3 +50,50 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
         FOREIGN KEY (producto_id)
         REFERENCES productos(id)
 );
+
+INSERT INTO categorias (
+    descripcion,
+    activo
+)
+VALUES
+    ('Hamburguesas', TRUE),
+    ('Bebidas', TRUE)
+ON CONFLICT (descripcion) DO NOTHING;
+
+INSERT INTO productos (
+    nombre,
+    descripcion,
+    precio,
+    categoria_id,
+    disponible,
+    imagen_url
+)
+SELECT
+    'Hamburguesa Suprema con Papas',
+    'Jugosa hamburguesa de carne con queso fundido, cebolla caramelizada, vegetales frescos y salsa especial, servida con una porción de papas fritas sazonadas.',
+    12.50,
+    categorias.id,
+    TRUE,
+    '/uploads/productos/80e8bc397bbd420f90d5957885018440.jpg'
+FROM categorias
+WHERE categorias.descripcion = 'Hamburguesas'
+ON CONFLICT (nombre) DO NOTHING;
+
+INSERT INTO productos (
+    nombre,
+    descripcion,
+    precio,
+    categoria_id,
+    disponible,
+    imagen_url
+)
+SELECT
+    'Limonada de Frambuesa y Menta',
+    'Refrescante bebida artesanal preparada con frambuesas, limón y hojas de menta, servida fría con hielo. Una combinación frutal, ligeramente cítrica y perfecta para acompañar cualquier comida.',
+    4.50,
+    categorias.id,
+    TRUE,
+    '/uploads/productos/74a5f0d21af249e49058898e41283406.png'
+FROM categorias
+WHERE categorias.descripcion = 'Bebidas'
+ON CONFLICT (nombre) DO NOTHING;
